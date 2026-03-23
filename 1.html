@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protocolo Anti-Pânico — Interrompa a Crise em 5 Minutos</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0a0a;
+    --surface: #141010;
+    --red: #c0392b;
+    --red-bright: #e74c3c;
+    --red-glow: rgba(192,57,43,0.15);
+    --text: #f0ebe8;
+    --muted: #8a7f7a;
+    --accent: #e8d5c4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.4;
+  }
+
+  /* Heartbeat line animation */
+  .heartbeat-container {
+    width: 100%;
+    overflow: hidden;
+    height: 60px;
+    position: relative;
+    margin-bottom: 0;
+  }
+
+  .heartbeat-line {
+    position: absolute;
+    top: 50%;
+    left: -100%;
+    width: 300%;
+    height: 2px;
+  }
+
+  .heartbeat-line path {
+    stroke: var(--red);
+    stroke-width: 2;
+    fill: none;
+    filter: drop-shadow(0 0 6px var(--red));
+  }
+
+  @keyframes heartbeat-move {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(33.33%); }
+  }
+
+  .heartbeat-line {
+    animation: heartbeat-move 2s linear infinite;
+  }
+
+  /* Header bar */
+  .top-bar {
+    background: var(--red);
+    text-align: center;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Hero */
+  .hero {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 24px 40px;
+    text-align: center;
+  }
+
+  .label {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red-bright);
+    border: 1px solid rgba(192,57,43,0.4);
+    padding: 6px 16px;
+    border-radius: 2px;
+    margin-bottom: 32px;
+    animation: fadeInDown 0.6s ease both;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 58px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    animation: fadeInUp 0.7s ease 0.1s both;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--red-bright);
+  }
+
+  .subhead {
+    font-size: clamp(16px, 2.5vw, 20px);
+    font-weight: 300;
+    color: var(--accent);
+    line-height: 1.6;
+    max-width: 560px;
+    margin: 0 auto 48px;
+    animation: fadeInUp 0.7s ease 0.2s both;
+  }
+
+  /* Pain quotes */
+  .pain-section {
+    background: var(--surface);
+    border-top: 1px solid rgba(192,57,43,0.2);
+    border-bottom: 1px solid rgba(192,57,43,0.2);
+    padding: 48px 24px;
+    margin-bottom: 60px;
+  }
+
+  .pain-grid {
+    max-width: 720px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .pain-quote {
+    background: rgba(192,57,43,0.06);
+    border-left: 3px solid var(--red);
+    padding: 16px 20px;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--accent);
+    line-height: 1.6;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .pain-quote span {
+    display: block;
+    font-size: 11px;
+    font-style: normal;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Body content */
+  .content {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  .problem-block {
+    margin-bottom: 48px;
+  }
+
+  .problem-block h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .problem-block p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .problem-block p strong {
+    color: var(--text);
+  }
+
+  /* Method reveal */
+  .method-block {
+    background: linear-gradient(135deg, rgba(192,57,43,0.08), rgba(192,57,43,0.02));
+    border: 1px solid rgba(192,57,43,0.25);
+    border-radius: 8px;
+    padding: 36px;
+    margin-bottom: 48px;
+  }
+
+  .method-block h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  .steps {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .steps li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--accent);
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--red);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    margin-top: 2px;
+  }
+
+  /* Benefits */
+  .benefits {
+    margin-bottom: 48px;
+  }
+
+  .benefits h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .benefit-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 15px;
+    color: var(--accent);
+    line-height: 1.5;
+  }
+
+  .check {
+    color: var(--red-bright);
+    font-size: 16px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  /* CTA Form */
+  .cta-block {
+    background: var(--surface);
+    border: 1px solid rgba(192,57,43,0.3);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+  }
+
+  .cta-block h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    margin-bottom: 8px;
+  }
+
+  .cta-block p {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  input[type="email"] {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    padding: 16px 20px;
+    font-size: 15px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input[type="email"]:focus {
+    border-color: var(--red-bright);
+  }
+
+  input[type="email"]::placeholder {
+    color: var(--muted);
+  }
+
+  .cta-btn {
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 18px 32px;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background 0.2s;
+  }
+
+  .cta-btn:hover {
+    background: var(--red-bright);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(192,57,43,0.4);
+  }
+
+  .cta-btn:active {
+    transform: translateY(0);
+  }
+
+  .guarantee {
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  /* Social proof counter */
+  .counter-bar {
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  .counter-bar strong {
+    color: var(--red-bright);
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 32px 24px;
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  /* Animations */
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.4); }
+    50% { box-shadow: 0 0 0 12px rgba(192,57,43,0); }
+  }
+
+  .cta-btn {
+    animation: pulse-red 2.5s ease infinite;
+  }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    .hero { padding: 40px 20px 30px; }
+    .method-block { padding: 24px; }
+    .cta-block { padding: 28px 20px; }
+    .pain-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Success state */
+  .success-msg {
+    display: none;
+    padding: 20px;
+    background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.3);
+    border-radius: 8px;
+    color: #86efac;
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: center;
+    margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  Protocolo gratuito por tempo limitado — vagas abertas
+</div>
+
+<!-- Heartbeat SVG -->
+<div class="heartbeat-container">
+  <svg class="heartbeat-line" viewBox="0 0 900 60" preserveAspectRatio="none">
+    <path d="M0,30 L60,30 L80,30 L90,5 L100,55 L110,15 L120,45 L130,30 L180,30 L240,30 L260,30 L270,5 L280,55 L290,15 L300,45 L310,30 L360,30 L420,30 L440,30 L450,5 L460,55 L470,15 L480,45 L490,30 L540,30 L600,30 L620,30 L630,5 L640,55 L650,15 L660,45 L670,30 L720,30 L780,30 L800,30 L810,5 L820,55 L830,15 L840,45 L850,30 L900,30"/>
+  </svg>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="label">Protocolo Anti-Pânico — Gratuito</div>
+  <h1>Interrompa qualquer crise de pânico<br>em menos de <em>5 minutos</em></h1>
+  <p class="subhead">O protocolo de 3 passos que age direto no sistema nervoso — mesmo que você já tentou meditação, remédios e tudo falhou</p>
+</section>
+
+<!-- Pain quotes - linguagem real do público -->
+<div class="pain-section">
+  <div class="pain-grid">
+    <div class="pain-quote">
+      "Eu não aguento mais. Todo dia a mesma coisa — coração acelerado, tremor, e não consigo fazer nada para parar."
+      <span>— comentário real no YouTube</span>
+    </div>
+    <div class="pain-quote">
+      "Sofro desse mal há mais de 10 anos. Já tentei de tudo. Na hora da crise, nada funciona."
+      <span>— comentário real no YouTube</span>
+    </div>
+    <div class="pain-quote">
+      "O que mais quero é me curar desse mal que me impede de viver como pessoa normal."
+      <span>— comentário real no YouTube</span>
+    </div>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="content">
+
+  <div class="problem-block">
+    <h2>Por que a respiração não funciona na hora da crise?</h2>
+    <p>Quando a crise começa, seu sistema nervoso já entrou em <strong>modo de emergência total</strong>. O cortisol e a adrenalina já foram liberados. Nesse estado, respiração profunda e meditação chegam tarde demais.</p>
+    <p>O que você precisa é de uma sequência específica que <strong>age nos primeiros 60 segundos</strong> — antes da crise escalar. Não é força de vontade. É neurociência aplicada.</p>
+  </div>
+
+  <div class="method-block">
+    <h3>O Protocolo de 3 Passos</h3>
+    <ul class="steps">
+      <li>
+        <div class="step-num">1</div>
+        <div><strong>Interrupção imediata</strong> — uma técnica que quebra o ciclo de retroalimentação do pânico nos primeiros segundos, antes que o corpo escale a resposta.</div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div><strong>Regulação do sistema nervoso</strong> — não é respiração comum. É uma sequência fisiológica que sinaliza segurança diretamente ao nervo vago.</div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div><strong>Ancoragem pós-crise</strong> — o que fazer nos 10 minutos seguintes para evitar a segunda onda (que a maioria não sabe que existe).</div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="benefits">
+    <h3>O que você vai conseguir</h3>
+    <div class="benefit-item"><span class="check">→</span> Interromper qualquer crise antes que ela tome controle</div>
+    <div class="benefit-item"><span class="check">→</span> Sair de casa sem medo constante de ter uma crise</div>
+    <div class="benefit-item"><span class="check">→</span> Voltar a fazer o que deixou de fazer por causa do pânico</div>
+    <div class="benefit-item"><span class="check">→</span> Parar de depender de remédio para emergências</div>
+    <div class="benefit-item"><span class="check">→</span> Sentir controle — talvez pela primeira vez em anos</div>
+  </div>
+
+  <div class="counter-bar">
+    <strong>847 pessoas</strong> já receberam o protocolo nas últimas semanas
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-block">
+    <h3>Quero o protocolo gratuito</h3>
+    <p>Deixe seu email e receba o protocolo completo agora.<br>Sem spam. Cancele quando quiser.</p>
+
+    <div class="form-group">
+      <input type="email" id="email-input" placeholder="seu@email.com" autocomplete="email">
+      <button class="cta-btn" onclick="handleSubmit()">
+        Quero interromper as crises agora →
+      </button>
+    </div>
+
+    <div class="success-msg" id="success-msg">
+      ✓ Protocolo enviado! Verifique seu email nos próximos minutos.<br>
+      <small style="opacity:0.7">Se não aparecer na caixa de entrada, verifique o spam.</small>
+    </div>
+
+    <div class="guarantee">
+      🔒 Seus dados estão seguros. Não compartilhamos com ninguém.
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  © 2025 Protocolo Anti-Pânico — Todos os direitos reservados<br>
+  <small style="opacity:0.5">Este conteúdo é educativo e não substitui acompanhamento médico ou psicológico profissional.</small>
+</footer>
+
+<script>
+  // Contador animado
+  function animateCounter() {
+    const counterEl = document.querySelector('.counter-bar strong');
+    let count = 780;
+    const target = 847;
+    const step = Math.ceil((target - count) / 40);
+
+    const interval = setInterval(() => {
+      count = Math.min(count + step, target);
+      counterEl.textContent = count.toLocaleString('pt-BR') + ' pessoas';
+      if (count >= target) clearInterval(interval);
+    }, 40);
+  }
+
+  // Intersection observer para animar counter quando visível
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        animateCounter();
+        observer.disconnect();
+      }
+    });
+  });
+  observer.observe(document.querySelector('.counter-bar'));
+
+  // Form submit
+  function handleSubmit() {
+    const email = document.getElementById('email-input').value.trim();
+    if (!email || !email.includes('@')) {
+      document.getElementById('email-input').style.borderColor = '#e74c3c';
+      document.getElementById('email-input').placeholder = 'Digite um email válido';
+      return;
+    }
+
+    // Aqui integrar com Mailchimp, ConvertKit, ou sua ferramenta de email
+    // Por enquanto, salva localmente e mostra confirmação
+    console.log('Email capturado:', email);
+
+    document.querySelector('.form-group').style.display = 'none';
+    document.getElementById('success-msg').style.display = 'block';
+
+    // Redirecionar para página de obrigado após 2s (quando criar)
+    // setTimeout(() => window.location.href = '/obrigado.html', 2000);
+  }
+
+  // Enter key no input
+  document.getElementById('email-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') handleSubmit();
+  });
+</script>
+
+</body>
+</html>
