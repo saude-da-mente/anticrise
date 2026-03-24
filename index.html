@@ -524,17 +524,29 @@
     <h3>Quero o protocolo gratuito</h3>
     <p>Deixe seu email e receba o protocolo completo agora.<br>Sem spam. Cancele quando quiser.</p>
 
-    <div class="form-group">
-      <input type="email" id="email-input" placeholder="seu@email.com" autocomplete="email">
-      <button class="cta-btn" onclick="handleSubmit()">
-        Quero interromper as crises agora →
-      </button>
-    </div>
-
-    <div class="success-msg" id="success-msg">
-      ✓ Protocolo enviado! Verifique seu email nos próximos minutos.<br>
-      <small style="opacity:0.7">Se não aparecer na caixa de entrada, verifique o spam.</small>
-    </div>
+    <!-- Mailchimp Form -->
+    <form action="https://github.us9.list-manage.com/subscribe/post?u=96c536bb9cf1d0946e0ada56b&amp;id=ebacceff82&amp;f_id=00c95be1f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" target="_blank" style="width:100%">
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:400px;margin:0 auto;">
+        <input type="email" name="EMAIL" placeholder="seu@email.com" required
+          style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:16px 20px;font-size:15px;color:#f0ebe8;font-family:'DM Sans',sans-serif;outline:none;width:100%;">
+        <!-- Bot protection -->
+        <div aria-hidden="true" style="position:absolute;left:-5000px;">
+          <input type="text" name="b_96c536bb9cf1d0946e0ada56b_ebacceff82" tabindex="-1" value="">
+        </div>
+        <button type="submit" name="subscribe"
+          style="background:#c0392b;color:white;border:none;border-radius:6px;padding:18px 32px;font-size:16px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;width:100%;animation:pulse-red 2.5s ease infinite;">
+          Quero interromper as crises agora →
+        </button>
+      </div>
+    </form>
+    <!-- Validação nativa -->
+    <script>
+    document.getElementById('mc-embedded-subscribe-form').addEventListener('submit', function(e) {
+      const btn = document.querySelector('[name="subscribe"]');
+      btn.value = 'Enviando...';
+      btn.disabled = true;
+    });
+    </script>
 
     <div class="guarantee">
       🔒 Seus dados estão seguros. Não compartilhamos com ninguém.
@@ -575,29 +587,7 @@
   observer.observe(document.querySelector('.counter-bar'));
 
   // Form submit
-  function handleSubmit() {
-    const email = document.getElementById('email-input').value.trim();
-    if (!email || !email.includes('@')) {
-      document.getElementById('email-input').style.borderColor = '#e74c3c';
-      document.getElementById('email-input').placeholder = 'Digite um email válido';
-      return;
-    }
-
-    // Aqui integrar com Mailchimp, ConvertKit, ou sua ferramenta de email
-    // Por enquanto, salva localmente e mostra confirmação
-    console.log('Email capturado:', email);
-
-    document.querySelector('.form-group').style.display = 'none';
-    document.getElementById('success-msg').style.display = 'block';
-
-    // Redirecionar para página de obrigado após 2s (quando criar)
-    // setTimeout(() => window.location.href = '/obrigado.html', 2000);
-  }
-
-  // Enter key no input
-  document.getElementById('email-input').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') handleSubmit();
-  });
+  // Mailchimp form handles submission
 </script>
 
 </body>
